@@ -51,7 +51,7 @@ public class A01_BasicSearchDemo1 {
 
 ​	也叫做折半查找
 
-说明：元素必须是有序的，从小到大，或者从大到小都是可以的。
+说明：**元素必须是有序的**，从小到大，或者从大到小都是可以的。
 
 如果是无序的，也可以先进行排序。但是排序之后，会改变原有数据的顺序，查找出来元素位置跟原来的元素可能是不一样的，所以排序之后再查找只能判断当前数据是否在容器当中，返回的索引无实际的意义。
 
@@ -72,9 +72,7 @@ public class A01_BasicSearchDemo1 {
 代码示例：
 
 ```java
-package com.itheima.search;
-
-public class A02_BinarySearchDemo1 {
+public class BinarySearchDemo1 {
     public static void main(String[] args) {
         //二分查找/折半查找
         //核心：
@@ -82,44 +80,37 @@ public class A02_BinarySearchDemo1 {
 
         //需求：定义一个方法利用二分查找，查询某个元素在数组中的索引
         //数据如下：{7, 23, 79, 81, 103, 127, 131, 147}
-
+        
         int[] arr = {7, 23, 79, 81, 103, 127, 131, 147};
-        System.out.println(binarySearch(arr, 150));
+        System.out.println(binarySearch(arr, 147));
+
     }
-
-    public static int binarySearch(int[] arr, int number){
-        //1.定义两个变量记录要查找的范围
-        int min = 0;
+    public static int binarySearch(int[] arr, int num) {
         int max = arr.length - 1;
-
-        //2.利用循环不断的去找要查找的数据
-        while(true){
-            if(min > max){
+        int min = 0;
+        //mid写在循环里, 因为要反复赋值
+        while (true) {
+            //num 不在数组中时
+            if (min > max) {
                 return -1;
             }
-            //3.找到min和max的中间位置
             int mid = (min + max) / 2;
-            //4.拿着mid指向的元素跟要查找的元素进行比较
-            if(arr[mid] > number){
-                //4.1 number在mid的左边
-                //min不变，max = mid - 1；
-                max = mid - 1;
-            }else if(arr[mid] < number){
-                //4.2 number在mid的右边
-                //max不变，min = mid + 1;
-                min = mid + 1;
-            }else{
-                //4.3 number跟mid指向的元素一样
-                //找到了
-                return mid;
-            }
 
+            //num 大小与 arr[mid] 
+            if (num < arr[mid]) {
+                max = mid - 1;
+            } else if (num > arr[mid]) {
+                min = mid + 1;
+            } else return mid;
         }
     }
 }
+
 ```
 
 ## 3. 插值查找
+
+`记个公式`
 
 在介绍插值查找之前，先考虑一个问题：
 
@@ -133,7 +124,9 @@ public class A02_BinarySearchDemo1 {
 
 我们可以将查找的点改进为如下：
 
-　　mid=low+(key-a[low])/(a[high]-a[low])*(high-low)，
+就用 int, 不用强转
+
+　　==mid=low+(key-a[low])/(a[high]-a[low])*(high-low)==，
 
 这样，让mid值的变化更靠近关键字key，这样也就间接地减少了比较次数。
 
@@ -145,7 +138,7 @@ public class A02_BinarySearchDemo1 {
 
 
 
-## 4. 斐波那契查找
+## 4. 斐波那契查找(了解概念)
 
 在介绍斐波那契查找算法之前，我们先介绍一下很它紧密相连并且大家都熟知的一个概念——黄金分割。
 
@@ -238,6 +231,12 @@ public class FeiBoSearchDemo {
 
 ## 5. 分块查找 
 
+`(会下面那个例子, 了解思想就足够了)`
+
+**(自己分块确实逆天, 但是对后面学习B树理解有帮助)**
+
+**可以看尚硅谷或者王道考研讲得更容易理解(图文并茂)**
+
 当数据表中的数据元素很多时，可以采用分块查找。
 
 汲取了顺序查找和折半查找各自的优点，既有动态结构，又适于快速查找
@@ -291,9 +290,22 @@ public class A03_BlockSearchDemo {
 
 
     }
+    
+    //定义一个方法，用来确定number在哪一块当中
+    public static int findIndexBlock(Block[] blockArr,int number){ //100
+
+
+        //从0索引开始遍历blockArr，如果number小于max，那么就表示number是在这一块当中的
+        for (int i = 0; i < blockArr.length; i++) {
+            if(number <= blockArr[i].getMax()){
+                return i;
+            }
+        }
+        return -1;
+    }
 
     //利用分块查找的原理，查询number的索引
-    private static int getIndex(Block[] blockArr, int[] arr, int number) {
+    public static int getIndex(Block[] blockArr, int[] arr, int number) {
         //1.确定number是在那一块当中
         int indexBlock = findIndexBlock(blockArr, number);
 
@@ -317,23 +329,6 @@ public class A03_BlockSearchDemo {
         }
         return -1;
     }
-
-
-    //定义一个方法，用来确定number在哪一块当中
-    public static int findIndexBlock(Block[] blockArr,int number){ //100
-
-
-        //从0索引开始遍历blockArr，如果number小于max，那么就表示number是在这一块当中的
-        for (int i = 0; i < blockArr.length; i++) {
-            if(number <= blockArr[i].getMax()){
-                return i;
-            }
-        }
-        return -1;
-    }
-
-
-
 }
 
 class Block{
@@ -457,10 +452,6 @@ class Block{
 在此不多做阐述。
 
 ​	不管是二叉查找树，还是平衡二叉树，还是红黑树，查找的性能都比较高
-
-
-
-
 
 
 
@@ -589,7 +580,7 @@ public class A02_SelectionDemo {
         //最终代码：
         //外循环：几轮
         //i:表示这一轮中，我拿着哪个索引上的数据跟后面的数据进行比较并交换
-        for (int i = 0; i < arr.length -1; i++) {
+        for (int i = 0; i < arr.length - 1; i++) {
             //内循环：每一轮我要干什么事情？
             //拿着i跟i后面的数据进行比较交换
             for (int j = i + 1; j < arr.length; j++) {
@@ -653,7 +644,7 @@ public class A03_InsertDemo {
         */
         int[] arr = {3, 44, 38, 5, 47, 15, 36, 26, 27, 2, 46, 4, 19, 50, 48};
 
-        //1.找到无序的哪一组数组是从哪个索引开始的。  2
+        //1.找到无序的哪一组数组是从哪个索引开始的。  
         int startIndex = -1;
         for (int i = 0; i < arr.length; i++) {
             if(arr[i] > arr[i + 1]){
@@ -662,21 +653,18 @@ public class A03_InsertDemo {
             }
         }
 
-        //2.遍历从startIndex开始到最后一个元素，依次得到无序的哪一组数据中的每一个元素
+        //2.遍历从startIndex开始到最后一个元素,依次得到无序的哪一组数据中的每一个元素
+        //第二个while循环把遍历到的数据, 插入到前面有序的这一组当中
+        //扑克牌例子, 下面是算法核心
         for (int i = startIndex; i < arr.length; i++) {
-            //问题：如何把遍历到的数据，插入到前面有序的这一组当中
-
-            //记录当前要插入数据的索引
-            int j = i;
-
-            while(j > 0 && arr[j] < arr[j - 1]){
-                //交换位置
+            //int j = i; 记录当前要插入数据的索引
+            // j 总是在变化的, 上面一层for循环每走一轮, 扑克牌左边组牌数 +1
+            // j 是右边组的牌, 从右往左比大小插进去
+            for (int j = i; j > 0 && arr[j] < arr[j - 1]; j--) {
                 int temp = arr[j];
                 arr[j] = arr[j - 1];
                 arr[j - 1] = temp;
-                j--;
             }
-
         }
         printArr(arr);
     }
@@ -707,6 +695,8 @@ public class A03_InsertDemo {
 
 它是处理大数据最快的排序算法之一了。
 
+(类似于双指针)
+
 ### 4.1 算法步骤
 
 1. 从数列中挑出一个元素，一般都是左边第一个数字，称为 "基准数";
@@ -715,15 +705,95 @@ public class A03_InsertDemo {
 4. 再执行前面的指针，找出第一个比基准数大的数字
 5. 交换两个指针指向的数字
 6. 直到两个指针相遇
-7. 将基准数跟指针指向位置的数字交换位置，称之为：基准数归位。
-8. 第一轮结束之后，基准数左边的数字都是比基准数小的，基准数右边的数字都是比基准数大的。
+7. 将基准数跟指针指向位置的数字交换位置，称之为：**基准数归位**。
+8. <u>第一轮结束之后，基准数左边的数字都是比基准数小的，基准数右边的数字都是比基准数大的。</u>
 9. 把基准数左边看做一个序列，把基准数右边看做一个序列，按照刚刚的规则递归排序
 
 ### 4.2 动图演示
 
+单边快速排序
+
 ![快速排序](./images/algorithm/%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F.gif)
 
+### Hoare 快速排序 (快排原版)
+
+![img](images/algorithmSearchAndSort/c6a8a267204a44fdb336859bd05c6098.gif)
+
+一定要先移动 **right** 再移动 **left**
+
+下面写法遇到重复数也没问题
+
+```java
+import java.util.Arrays;
+
+public class QuickSortHoare {
+    public static void main(String[] args) {
+        int[] arr = {1, 1, 6, 2, 7, 9, 3, 4, 5, 1, 10, 8};
+        quickSort(arr, 0, arr.length - 1);
+        System.out.println(Arrays.toString(arr));
+    }
+
+    public static void quickSort(int[] arr, int i, int j) {
+        //pivot是基准索引
+        int pivot = i;
+        int left = i;
+        int right = j;
+
+        //设置递归出口
+        if (left > right) {
+            return;
+        }
+
+        //利用循环找到要交换的数字
+        while (left != right) {
+            //必须先找 right 再找left
+            // if 里面只有 break, 不满足 if 才移动指针, 满足了就定住指针
+            // 两个 if 右边的"arr[right] < arr[pivot]" 中的 "<" 和 ">" 对调 就会变成降序
+
+            //利用right，从后往前开始找，找比基准数小的数字
+            while (true) {
+                //找到一个右边的比基准数小的数指针right就定住
+                if (left >= right || arr[right] < arr[pivot]) {
+                    break;
+                }
+                right--;//right是减不是加
+            }
+
+            //利用left，从前往后找，找比基准数大的数字
+            while (true) {
+                //找到一个左边的比基准数大的数指针left就定住
+                if (left >= right || arr[left] > arr[pivot]) {
+                    break;
+                }
+                left++;
+            }
+            //移动完指针, 交换左右指针所指向的索引的值
+            int temp = arr[left];
+            arr[left] = arr[right];
+            arr[right] = temp;
+        }
+        //核心是 left 去和 i 交换
+
+        //当left > right的时候，那么上面的循环就会结束
+        //表示已经找到了基准数在数组中应存入的位置
+        //基准数归位
+        //就是拿着这个范围中的第一个数字，跟left指向的元素进行交换
+        //!注意!不是pivot去换left, 而是 i 去换left!
+        int temp = arr[i];
+        arr[i] = arr[left];
+        arr[left] = temp;
+
+        //开始递归, 下面要记
+        //确定pivot左边的范围，重复刚刚所做的事情
+        quickSort(arr, i, left - 1);
+        //确定pivot右边的范围，重复刚刚所做的事情
+        quickSort(arr, left + 1, j);
+    }
+}
+```
+
  ```java
+//黑马程序员 ↓
 package com.itheima.mysort;
 
 import java.util.Arrays;
@@ -751,6 +821,7 @@ public class A05_QuickSortDemo {
 
 
         long start = System.currentTimeMillis();
+        //开始快速排序
         quickSort(arr, 0, arr.length - 1);
         long end = System.currentTimeMillis();
 
@@ -782,7 +853,6 @@ public class A05_QuickSortDemo {
             //递归的出口
             return;
         }
-
 
 
         //记录基准数
@@ -831,6 +901,39 @@ public class A05_QuickSortDemo {
 }
  ```
 
+# 数据结构(二叉树, 红黑树)
 
+看下面视频 P194-196
 
-其他排序方式待更新~
+【黑马程序员Java零基础视频教程_上部(Java入门，含斯坦福大学练习题+力扣算法题和大厂java面试题）】https://www.bilibili.com/video/BV17F411T7Ao?p=194&vd_source=08ddee921942fc6a74f2efd4c94d5249
+
+![image-20240715124117246](images/algorithmSearchAndSort/image-20240715124117246.png)
+
+## 平衡二叉查找树(AVL)
+
+下面的 **任意结点的左右子树高度至多差1 **就是平衡的条件
+
+AVL是一种很古老的BST，大学数据结构课学的就是它，当时快被各种旋转搞吐了，今天再看也还是有些晕。它并不严格要求树必须完全保持平衡（perfectly balanced），而是放松了平衡的条件，即**a）任意结点的左右子树高度至多差1**就行，同时靠**b）旋转（rotation）保持树的平衡**。这两点也是决定一颗树是否是AVL树的关键特点，否则从结构上来说，它与后面讲到的红黑树都是平衡二叉树，也都是自调整的（self-adjust）。
+
+![image-20240715124140166](images/algorithmSearchAndSort/image-20240715124140166.png)
+
+1. 小于根节点的放左边,大于根节点的放右边;
+2. 与根节点进行比较, 大的查找右边, 小的查左边
+3. 当二叉查找树不平衡时需要进行旋转提高查询效率
+4. 当任意节点的左右子树高度差值大于1时触发旋转机制
+5. 左左是指根节点的左子树的左子树由于添加元素而导致二叉树不再是平衡二叉树的情况，这时需要将整体进行**右旋**
+6. 左右是指根节点的左子树的右子树由于添加元素而导致二叉树不再是平衡二叉树的情况，这时需要**先将局部(左子树)左旋, 再将整体进行右旋**
+7. 右右是指根节点的右子树的右子树由于添加元素而导致二叉树不再是平衡二叉树的情况，这时需要将整体进行**左旋**
+8. 右左是指根节点的右子树的左子树由于添加元素而导致二叉树不再是平衡二叉树的情况，这时需要**先将局部(右子树)右旋, 再将整体进行左旋**
+
+## 红黑树 ( 平衡二叉B树 )（增删改查的性能都很好）
+
+![image-20240715163345188](images/algorithmSearchAndSort/image-20240715163345188.png)
+
+![image-20240715163512439](images/algorithmSearchAndSort/image-20240715163512439.png)
+
+#### 红黑树添加节点的规则
+
+![image-20240715165234754](images/algorithmSearchAndSort/image-20240715165234754.png)
+
+## 
