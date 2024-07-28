@@ -755,7 +755,69 @@ public class StreamToArray {
   }
   ```
 
-### 2.6 Stream流综合练习【应用】
+
+
+### 2.6 Stream流的收集方法 collect()
+
+可以把流的数据倒回集合中 (List Set Map)
+
+```java
+.collect(Collectors.toList());
+.collect(Collectors.toSet());
+.collect(Collectors.toMap(键的生成规则,值的生成规则));
+```
+
+```java
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+public class Demo {
+    public static void main(String[] args) {
+        ArrayList<String> arrayList = new ArrayList<>();
+        Collections.addAll(arrayList, "张三-男-20", "李四-男-25", "王五-女-22");
+
+        //把所有男性收集到List集合中
+        List<String> list = arrayList.stream().filter(s -> "男".equals(s.split("-")[1])).collect(Collectors.toList());
+        System.out.println(list);
+
+        //把所有女性收集到Set集合中
+        Set<String> set = arrayList.stream().filter(s -> "女".equals(s.split("-")[1])).collect(Collectors.toSet());
+        System.out.println(set);
+        
+        //把所有男性 姓名 + 年龄 收集到Map集合中
+        //注意! toMap() 原ArrayList中不能添加重复的键!
+        
+        Map<String, Integer> map = arrayList.stream()
+                .filter(s -> "男".equals(s.split("-")[1]))
+                .collect(Collectors.toMap(new Function<String, String>() {
+                                              @Override
+                                              public String apply(String s) {
+                                                  return s.split("-")[0];
+                                              }
+                                          },
+                        new Function<String, Integer>() {
+                            @Override
+                            public Integer apply(String s) {
+                                return Integer.parseInt(s.split("-")[2]);
+                            }
+                        }));
+        System.out.println("匿名内部类: " + map);
+
+        //Lambda表达式
+        Map<String, String> mapLambda = arrayList.stream().filter(s -> "男".equals(s.split("-")[1])).collect(Collectors.toMap(s -> s.split("-")[0], s -> s.split("-")[2]));
+        System.out.println("Lambda表达式: " + mapLambda);
+
+    }
+}
+
+```
+
+
+
+
+
+### 2.7 Stream流综合练习【应用】
 
 - 案例需求
 
@@ -829,7 +891,23 @@ public class StreamToArray {
   }
   ```
 
-## 3. 方法引用
+## 3. 方法引用 (看完语法直接看综合练习)
+
+方法引用的语法
+方法引用的语法由两部分组成：类名或对象名和方法名，中间使用双冒号(::)进行分隔。根据方法引用的情况，可以分为以下几种形式：
+
++ 静态方法引用:   类名::静态方法名
++ 实例方法引用:   对象名::实例方法名
++ 特定类的任意对象方法引用:   类名::实例方法名
++ 构造方法引用:   类名::new
++ 数组引用 (创建数组):   数据类型[]::new
+
+注意事项: 
+
++ 要有函数式接口
++ 被引用方法必须已经存在
++ 被引用方法的形参和返回值需要跟抽象方法保持一致
++ 被引用方法的功能要满足当前需求
 
 ### 3.1 体验方法引用【理解】
 
@@ -881,7 +959,7 @@ public class StreamToArray {
 
   - 如果使用Lambda，那么根据“可推导就是可省略”的原则，无需指定参数类型，也无需指定的重载形式，它们都将被自动推导
   - 如果使用方法引用，也是同样可以根据上下文进行推导
-  - 方法引用是Lambda的孪生兄弟
+  - **方法引用是Lambda的孪生兄弟**
 
 ### 3.3 引用类方法【应用】
 
@@ -1061,7 +1139,11 @@ public class StreamToArray {
 
 ​	引用构造器，其实就是引用构造方法
 
-- l格式
+- 目的
+
+  创建对象
+
+- 格式
 
   类名::new
 
@@ -1142,3 +1224,63 @@ public class StreamToArray {
 
   Lambda表达式被构造器替代的时候，它的形式参数全部传递给构造器作为参数
 
+### 综合练习
+
+<u>用方法引用获取Student中的name并放入一个新的list中</u>
+
+Student
+
+```java
+public class Student {
+    private String name;
+    private int age;
+
+    public Student() {
+    }
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+```
+
+Main
+
+```java
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class StuTest {
+    public static void main(String[] args) {
+        //用方法引用获取Student中的name并放入一个新的list中
+        ArrayList<Student> list = new ArrayList<>();
+        list.add(new Student("zhangsan", 23));
+        list.add(new Student("lisi", 24));
+        list.add(new Student("wangwu", 25));
+
+        //Lambda表达式写法
+        //String[] newStr = list.stream().map(student -> student.getName()).toArray(str -> new String[str]);
+        //System.out.println(Arrays.toString(newStr));
+
+        String[] str = list.stream().map(Student::getName).toArray(String[]::new);
+        System.out.println(Arrays.toString(str));
+    }
+}
+```
